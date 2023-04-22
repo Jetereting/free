@@ -5,9 +5,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/gocolly/colly/v2/extensions"
-
 	"github.com/gocolly/colly/v2"
+	"github.com/gocolly/colly/v2/extensions"
 )
 
 type Downloader struct {
@@ -41,4 +40,16 @@ func (that *Downloader) File(fPath string) {
 			f.Close()
 		}
 	})
+}
+
+func (that *Downloader) UseProxy(proxy ...string) {
+	var p string
+	if len(proxy) > 0 && proxy[0] != "" {
+		p = proxy[0]
+	} else {
+		p = os.Getenv("FREE_PROXY")
+	}
+	if p != "" {
+		that.colletor.SetProxy(p)
+	}
 }

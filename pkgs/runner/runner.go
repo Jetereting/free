@@ -5,21 +5,12 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/gogf/gf/container/gmap"
 	"github.com/moqsien/free/pkgs/sites"
+	"github.com/moqsien/free/pkgs/utils"
 )
-
-func PathIsExist(path string) (bool, error) {
-	_, _err := os.Stat(path)
-	if _err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(_err) {
-		return false, nil
-	}
-	return false, _err
-}
 
 type VList struct {
 	Total int      `json:"total"`
@@ -27,12 +18,13 @@ type VList struct {
 }
 
 type Result struct {
-	VmessList *VList `json:"vmess"`
-	SSRList   *VList `json:"ssr"`
-	VlessList *VList `json:"vless"`
-	SSList    *VList `json:"ss"`
-	Trojan    *VList `json:"trojan"`
-	Other     *VList `json:"other"`
+	VmessList  *VList `json:"vmess"`
+	SSRList    *VList `json:"ssr"`
+	VlessList  *VList `json:"vless"`
+	SSList     *VList `json:"ss"`
+	Trojan     *VList `json:"trojan"`
+	Other      *VList `json:"other"`
+	UpdateTime string `json:"update_time"`
 }
 
 type Runner struct {
@@ -75,7 +67,7 @@ func (that *Runner) getVpns() {
 	for _, site := range that.sites {
 		vpnList := site.Run()
 		for _, v := range vpnList {
-			v = strings.ReplaceAll(v, " ", "")
+			v = strings.TrimSpace(v)
 			if strings.HasPrefix(v, "vmess") {
 				that.vmess.Set(v, struct{}{})
 			} else if strings.HasPrefix(v, "vless") {
@@ -103,10 +95,11 @@ func (that *Runner) getVpns() {
 	that.result.Trojan.Total = that.trojan.Size()
 	that.result.Other.List = that.other.Keys()
 	that.result.Other.Total = that.other.Size()
+	that.result.UpdateTime = time.Now().Format("2006-01-02 15:04:05")
 }
 
 func (that *Runner) save(fpath string) {
-	if ok, _ := PathIsExist(fpath); !ok {
+	if ok, _ := utils.PathIsExist(fpath); !ok {
 		os.MkdirAll(fpath, 0666)
 	}
 	if result, err := json.MarshalIndent(that.result, "", "   "); err == nil {
