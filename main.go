@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/moqsien/free/pkgs/runner"
 	"github.com/moqsien/free/pkgs/sites"
 )
@@ -8,5 +10,7 @@ import (
 func main() {
 	rn := runner.NewRunner()
 	rn.RegisterSite(sites.NewMianfieFQ())
-	rn.Run()
+
+	storage_dir := os.Getenv("FREE_VPN_DIR")
+	rn.Run(storage_dir)
 }

@@ -105,8 +105,7 @@ func (that *Runner) getVpns() {
 	that.result.Other.Total = that.other.Size()
 }
 
-func (that *Runner) save() {
-	fpath := os.Getenv("FREE_VPN_DIR")
+func (that *Runner) save(fpath string) {
 	if ok, _ := PathIsExist(fpath); !ok {
 		os.MkdirAll(fpath, 0666)
 	}
@@ -116,7 +115,7 @@ func (that *Runner) save() {
 	}
 }
 
-func (that *Runner) Run() {
+func (that *Runner) Run(storage_dir string) {
 	that.getVpns()
-	that.save()
+	that.save(storage_dir)
 }
