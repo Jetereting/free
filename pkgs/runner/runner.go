@@ -2,11 +2,11 @@ package runner
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/gogf/gf/container/gmap"
 	"github.com/moqsien/free/pkgs/sites"
 )
 
@@ -21,28 +21,47 @@ func PathIsExist(path string) (bool, error) {
 	return false, _err
 }
 
+type VList struct {
+	Total int      `json:"total"`
+	List  []string `json:"list"`
+}
+
 type Result struct {
-	VmessList []string `json:"vmess"`
-	SSRList   []string `json:"ssr"`
-	VlessList []string `json:"vless"`
-	SSList    []string `json:"ss"`
-	Trojan    []string `json:"trojan"`
+	VmessList *VList `json:"vmess"`
+	SSRList   *VList `json:"ssr"`
+	VlessList *VList `json:"vless"`
+	SSList    *VList `json:"ss"`
+	Trojan    *VList `json:"trojan"`
+	Other     *VList `json:"other"`
 }
 
 type Runner struct {
 	result *Result
+	vmess  *gmap.StrAnyMap
+	ssr    *gmap.StrAnyMap
+	ss     *gmap.StrAnyMap
+	trojan *gmap.StrAnyMap
+	vless  *gmap.StrAnyMap
+	other  *gmap.StrAnyMap
 	sites  []sites.Site
 }
 
 func NewRunner() *Runner {
 	return &Runner{
 		result: &Result{
-			VmessList: []string{},
-			SSRList:   []string{},
-			VlessList: []string{},
-			SSList:    []string{},
-			Trojan:    []string{},
+			VmessList: &VList{},
+			VlessList: &VList{},
+			SSRList:   &VList{},
+			SSList:    &VList{},
+			Trojan:    &VList{},
+			Other:     &VList{},
 		},
+		vmess:  gmap.NewStrAnyMap(true),
+		ssr:    gmap.NewStrAnyMap(true),
+		ss:     gmap.NewStrAnyMap(true),
+		trojan: gmap.NewStrAnyMap(true),
+		vless:  gmap.NewStrAnyMap(true),
+		other:  gmap.NewStrAnyMap(true),
 	}
 }
 
@@ -58,20 +77,32 @@ func (that *Runner) getVpns() {
 		for _, v := range vpnList {
 			v = strings.ReplaceAll(v, " ", "")
 			if strings.HasPrefix(v, "vmess") {
-				that.result.VmessList = append(that.result.VmessList, v)
+				that.vmess.Set(v, struct{}{})
 			} else if strings.HasPrefix(v, "vless") {
-				that.result.VlessList = append(that.result.VlessList, v)
+				that.vless.Set(v, struct{}{})
 			} else if strings.HasPrefix(v, "ssr") {
-				that.result.SSRList = append(that.result.SSRList, v)
+				that.ssr.Set(v, struct{}{})
 			} else if strings.HasPrefix(v, "ss") {
-				that.result.SSList = append(that.result.SSList, v)
+				that.ss.Set(v, struct{}{})
 			} else if strings.HasPrefix(v, "trojan") {
-				that.result.Trojan = append(that.result.Trojan, v)
+				that.trojan.Set(v, struct{}{})
 			} else {
-				fmt.Println("Do not support: ", v)
+				that.other.Set(v, struct{}{})
 			}
 		}
 	}
+	that.result.VmessList.List = that.vmess.Keys()
+	that.result.VmessList.Total = that.vmess.Size()
+	that.result.VlessList.List = that.vless.Keys()
+	that.result.VlessList.Total = that.vless.Size()
+	that.result.SSRList.List = that.ssr.Keys()
+	that.result.SSRList.Total = that.ssr.Size()
+	that.result.SSList.List = that.ss.Keys()
+	that.result.SSList.Total = that.ss.Size()
+	that.result.Trojan.List = that.trojan.Keys()
+	that.result.Trojan.Total = that.trojan.Size()
+	that.result.Other.List = that.other.Keys()
+	that.result.Other.Total = that.other.Size()
 }
 
 func (that *Runner) save() {
