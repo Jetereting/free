@@ -44,6 +44,7 @@ func main() {
 	rn := runner.NewRunner()
 	rn.RegisterSite(sites.NewMianfieFQ())
 	rn.RegisterSite(sites.NewCFMem())
+	rn.RegisterSite(sites.NewWPBlog())
 	rn.RegisterSite(sites.NewSomeFree())
 	storage_dir := os.Getenv("FREE_VPN_DIR")
 	rn.Run(storage_dir)
