@@ -39,7 +39,7 @@ func (that *FreeNode) getDoc() {
 			fmt.Println("1. ", _url)
 			that.d = query.NewDownloader(_url)
 			that.d.SetHeader("referer", "https://www.freefq.com/free-xray/")
-			that.d.SetTimeout(120 * time.Second)
+			that.d.SetTimeout(30 * time.Second)
 			res := that.d.Get()
 			fmt.Println(string(res))
 			if doc, err = goquery.NewDocumentFromReader(bytes.NewBuffer(res)); err == nil {

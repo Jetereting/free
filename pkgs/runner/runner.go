@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -103,8 +104,9 @@ func (that *Runner) save(fpath string) {
 		os.MkdirAll(fpath, 0666)
 	}
 	if result, err := json.MarshalIndent(that.result, "", "   "); err == nil {
-		fpath = filepath.Join(fpath, "free_vpn.json")
-		os.WriteFile(fpath, result, os.ModePerm)
+		fpath = filepath.Join(fpath, "free.txt")
+		res := base64.StdEncoding.EncodeToString(result)
+		os.WriteFile(fpath, []byte(res), os.ModePerm)
 	}
 }
 
