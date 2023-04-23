@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"time"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/extensions"
@@ -52,4 +53,14 @@ func (that *Downloader) UseProxy(proxy ...string) {
 	if p != "" {
 		that.colletor.SetProxy(p)
 	}
+}
+
+func (that *Downloader) SetTimeout(timeout time.Duration) {
+	that.colletor.SetRequestTimeout(timeout)
+}
+
+func (that *Downloader) SetHeader(key, value string) {
+	that.colletor.OnRequest(func(r *colly.Request) {
+		r.Headers.Set(key, value)
+	})
 }
