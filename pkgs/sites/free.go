@@ -50,6 +50,7 @@ func (that *SomeFree) setUrls() {
 
 func (that *SomeFree) getAndParse() {
 	for _, _url := range that.Urls {
+		fmt.Println("Handle: ", _url.Url)
 		that.d = query.NewDownloader(_url.Url)
 		if _url.EnableProxy {
 			that.d.UseProxy()

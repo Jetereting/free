@@ -16,37 +16,45 @@ type FreeNode struct {
 	Doc    *goquery.Document
 	d      *query.Downloader
 	host   string
+	Urls   []string
 }
 
 func NewFreeNode() *FreeNode {
 	return &FreeNode{
 		Result: []string{},
-		d:      query.NewDownloader("https://www.freefq.com/free-xray/"),
 		host:   "https://www.freefq.com",
+		Urls: []string{
+			"https://freefq.com/v2ray/",
+			"https://freefq.com/free-ssr/",
+			"https://freefq.com/free-ss/",
+			"https://www.freefq.com/free-xray/",
+			"https://freefq.com/freeuser/",
+			"https://freefq.com/free-trojan/",
+		},
 	}
 }
 
 func (that *FreeNode) getDoc() {
 	that.d.UseProxy()
-	that.d.SetTimeout(30 * time.Second)
+	that.d.SetTimeout(60 * time.Second)
 	resp := that.d.Get()
 	if len(resp) > 0 {
 		if doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(resp)); err == nil {
 			_url := doc.Find(".news_list").Find("table").Eq(1).Find("a").First().AttrOr("href", "")
+			fmt.Println("  [x] ", _url)
 			if !strings.Contains(_url, "http") {
 				_url, _ = url.JoinPath(that.host, _url)
 			}
-			fmt.Println("1. ", _url)
 			that.d = query.NewDownloader(_url)
-			that.d.SetHeader("referer", "https://www.freefq.com/free-xray/")
-			that.d.SetTimeout(30 * time.Second)
+			that.d.UseProxy()
+			that.d.SetTimeout(60 * time.Second)
 			res := that.d.Get()
-			fmt.Println(string(res))
 			if doc, err = goquery.NewDocumentFromReader(bytes.NewBuffer(res)); err == nil {
 				if _url = doc.Find("fieldset").Find("a").AttrOr("href", ""); _url != "" {
 					that.d = query.NewDownloader(_url)
-					fmt.Println(_url)
-					that.d.SetTimeout(120 * time.Second)
+					fmt.Println("    [*] ", _url)
+					that.d.SetTimeout(60 * time.Second)
+					that.d.UseProxy()
 					r := that.d.Get()
 					if that.Doc, err = goquery.NewDocumentFromReader(bytes.NewBuffer(r)); err != nil {
 						that.Doc = nil
@@ -57,7 +65,36 @@ func (that *FreeNode) getDoc() {
 	}
 }
 
+func (that *FreeNode) parse() {
+	if that.Doc != nil {
+		that.Doc.Find("font").Each(func(i int, s *goquery.Selection) {
+			s.Find("p").Each(func(i int, ss *goquery.Selection) {
+				text := ss.Text()
+				for _, value := range strings.Split(text, "\n") {
+					value = strings.TrimSpace(value)
+					if strings.HasPrefix(value, "vmess://") {
+						that.Result = append(that.Result, value)
+					} else if strings.HasPrefix(value, "ss://") {
+						that.Result = append(that.Result, value)
+					} else if strings.HasPrefix(value, "ssr://") {
+						that.Result = append(that.Result, value)
+					} else if strings.HasPrefix(value, "vless://") {
+						that.Result = append(that.Result, value)
+					} else if strings.HasPrefix(value, "trojan://") {
+						that.Result = append(that.Result, value)
+					}
+				}
+			})
+		})
+	}
+}
+
 func (that *FreeNode) Run() []string {
-	that.getDoc()
+	for _, pUrl := range that.Urls {
+		fmt.Println("Handle: ", pUrl)
+		that.d = query.NewDownloader(pUrl)
+		that.getDoc()
+		that.parse()
+	}
 	return that.Result
 }

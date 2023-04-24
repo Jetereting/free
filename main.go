@@ -37,8 +37,8 @@ https://jichangtuijian.com/%E6%9C%BA%E5%9C%BA%E8%AE%A2%E9%98%85%E9%93%BE%E6%8E%A
 func init() {
 	var cstZone = time.FixedZone("CST", 8*3600)
 	time.Local = cstZone
-	os.Setenv("FREE_PROXY", "socks5://localhost:1089")
-	// os.Setenv("FREE_PROXY", "socks5://localhost:2019")
+	// os.Setenv("FREE_PROXY", "socks5://localhost:1089")
+	os.Setenv("FREE_PROXY", "socks5://localhost:2019")
 }
 
 func main() {
@@ -47,7 +47,7 @@ func main() {
 	rn.RegisterSite(sites.NewCFMem())
 	rn.RegisterSite(sites.NewWPBlog())
 	rn.RegisterSite(sites.NewSomeFree())
-	// rn.RegisterSite(sites.NewFreeNode())
+	rn.RegisterSite(sites.NewFreeNode())
 	storage_dir := os.Getenv("FREE_VPN_DIR")
 	rn.Run(storage_dir)
 }

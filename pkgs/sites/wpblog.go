@@ -2,11 +2,14 @@ package sites
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/moqsien/free/pkgs/query"
 )
+
+var WPBlogUrl = "https://www.wenpblog.com/list/5/1.html"
 
 type WPBlog struct {
 	Result []string
@@ -17,7 +20,7 @@ type WPBlog struct {
 func NewWPBlog() *WPBlog {
 	return &WPBlog{
 		Result: []string{},
-		d:      query.NewDownloader("https://www.wenpblog.com/list/5/1.html"),
+		d:      query.NewDownloader(WPBlogUrl),
 	}
 }
 
@@ -47,6 +50,7 @@ func (that *WPBlog) parse() {
 }
 
 func (that *WPBlog) Run() []string {
+	fmt.Println("Handle: ", WPBlogUrl)
 	that.getDoc()
 	that.parse()
 	return that.Result

@@ -9,6 +9,8 @@ import (
 	"github.com/moqsien/free/pkgs/query"
 )
 
+var MFFQUrl string = "https://gitlab.com/mianfeifq/share/-/blob/master/README.md?format=json&viewer=rich"
+
 type MianfeiFQ struct {
 	Result []string
 	Doc    *goquery.Document
@@ -18,7 +20,7 @@ type MianfeiFQ struct {
 func NewMianfieFQ() *MianfeiFQ {
 	return &MianfeiFQ{
 		Result: []string{},
-		d:      query.NewDownloader("https://gitlab.com/mianfeifq/share/-/blob/master/README.md?format=json&viewer=rich"),
+		d:      query.NewDownloader(MFFQUrl),
 	}
 }
 
@@ -47,6 +49,7 @@ func (that *MianfeiFQ) parse() {
 }
 
 func (that *MianfeiFQ) Run() []string {
+	fmt.Println("Handle: ", MFFQUrl)
 	that.getDoc()
 	that.parse()
 	return that.Result
