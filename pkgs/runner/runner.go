@@ -1,8 +1,8 @@
 package runner
 
 import (
-	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,6 +25,11 @@ type Result struct {
 	SSList     *VList `json:"ss"`
 	Trojan     *VList `json:"trojan"`
 	Other      *VList `json:"other"`
+	UpdateTime string `json:"update_time"`
+}
+
+type JsonEncoded struct {
+	Verifier   string `json:"verifier"`
 	UpdateTime string `json:"update_time"`
 }
 
@@ -104,9 +109,20 @@ func (that *Runner) save(fpath string) {
 		os.MkdirAll(fpath, 0666)
 	}
 	if result, err := json.MarshalIndent(that.result, "", "   "); err == nil {
-		fpath = filepath.Join(fpath, "free.txt")
-		res := base64.StdEncoding.EncodeToString(result)
-		os.WriteFile(fpath, []byte(res), os.ModePerm)
+		fpath = filepath.Join(fpath, "conf.txt")
+		if res, err := utils.DefaultCrypt.AesEncrypt(result); err != nil {
+			fmt.Println(err)
+			return
+		} else {
+			// co := &JsonEncoded{
+			// 	Verifier:   string(res),
+			// 	UpdateTime: that.result.UpdateTime,
+			// }
+			// if content, err := json.MarshalIndent(co, "", " "); err == nil {
+			// 	os.WriteFile(fpath, content, os.ModePerm)
+			// }
+			os.WriteFile(fpath, res, os.ModePerm)
+		}
 	}
 }
 
