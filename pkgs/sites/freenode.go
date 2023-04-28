@@ -67,24 +67,44 @@ func (that *FreeNode) getDoc() {
 
 func (that *FreeNode) parse() {
 	if that.Doc != nil {
-		that.Doc.Find("font").Each(func(i int, s *goquery.Selection) {
-			s.Find("p").Each(func(i int, ss *goquery.Selection) {
-				text := ss.Text()
-				for _, value := range strings.Split(text, "\n") {
-					value = strings.TrimSpace(value)
-					if strings.HasPrefix(value, "vmess://") {
-						that.Result = append(that.Result, value)
-					} else if strings.HasPrefix(value, "ss://") {
-						that.Result = append(that.Result, value)
-					} else if strings.HasPrefix(value, "ssr://") {
-						that.Result = append(that.Result, value)
-					} else if strings.HasPrefix(value, "vless://") {
-						that.Result = append(that.Result, value)
-					} else if strings.HasPrefix(value, "trojan://") {
-						that.Result = append(that.Result, value)
-					}
+		// that.Doc.Find("font").Each(func(i int, s *goquery.Selection) {
+		// 	s.Find("p").Each(func(i int, ss *goquery.Selection) {
+		// 		text := ss.Text()
+		// 		for _, value := range strings.Split(text, "\n") {
+		// 			value = strings.TrimSpace(value)
+		// 			if strings.HasPrefix(value, "vmess://") {
+		// 				that.Result = append(that.Result, value)
+		// 			} else if strings.HasPrefix(value, "ss://") {
+		// 				that.Result = append(that.Result, value)
+		// 			} else if strings.HasPrefix(value, "ssr://") {
+		// 				that.Result = append(that.Result, value)
+		// 			} else if strings.HasPrefix(value, "vless://") {
+		// 				that.Result = append(that.Result, value)
+		// 			} else if strings.HasPrefix(value, "trojan://") {
+		// 				that.Result = append(that.Result, value)
+		// 			}
+		// 		}
+		// 	})
+		// })
+		that.Doc.Find("p").Each(func(i int, ss *goquery.Selection) {
+			text := ss.Text()
+			if !strings.Contains(text, "://") {
+				return
+			}
+			for _, value := range strings.Split(text, "\n") {
+				value = strings.TrimSpace(value)
+				if strings.HasPrefix(value, "vmess://") {
+					that.Result = append(that.Result, value)
+				} else if strings.HasPrefix(value, "ss://") {
+					that.Result = append(that.Result, value)
+				} else if strings.HasPrefix(value, "ssr://") {
+					that.Result = append(that.Result, value)
+				} else if strings.HasPrefix(value, "vless://") {
+					that.Result = append(that.Result, value)
+				} else if strings.HasPrefix(value, "trojan://") {
+					that.Result = append(that.Result, value)
 				}
-			})
+			}
 		})
 	}
 }
@@ -96,5 +116,6 @@ func (that *FreeNode) Run() []string {
 		that.getDoc()
 		that.parse()
 	}
+	// fmt.Println(that.Result)
 	return that.Result
 }
