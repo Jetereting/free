@@ -36,7 +36,7 @@ func NewFreeNode() *FreeNode {
 
 func (that *FreeNode) getDoc() {
 	that.d.UseProxy()
-	that.d.SetTimeout(60 * time.Second)
+	that.d.SetTimeout(15 * time.Second)
 	resp := that.d.Get()
 	if len(resp) > 0 {
 		if doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(resp)); err == nil {
@@ -47,13 +47,13 @@ func (that *FreeNode) getDoc() {
 			}
 			that.d = query.NewDownloader(_url)
 			that.d.UseProxy()
-			that.d.SetTimeout(60 * time.Second)
+			that.d.SetTimeout(15 * time.Second)
 			res := that.d.Get()
 			if doc, err = goquery.NewDocumentFromReader(bytes.NewBuffer(res)); err == nil {
 				if _url = doc.Find("fieldset").Find("a").AttrOr("href", ""); _url != "" {
 					that.d = query.NewDownloader(_url)
 					fmt.Println("    [*] ", _url)
-					that.d.SetTimeout(60 * time.Second)
+					that.d.SetTimeout(30 * time.Second)
 					that.d.UseProxy()
 					r := that.d.Get()
 					if that.Doc, err = goquery.NewDocumentFromReader(bytes.NewBuffer(r)); err != nil {
