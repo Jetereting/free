@@ -30,6 +30,7 @@ func NewSomeFree() *SomeFree {
 
 func (that *SomeFree) setUrls() {
 	that.Urls = []PUrl{
+		{"https://bulink.me/sub/q2kpq/vm", false},
 		{"https://raw.fastgit.org/freefq/free/master/v2", false},
 		{"https://sub.nicevpn.top/long", false},
 		{fmt.Sprintf("https://clashnode.com/wp-content/uploads/%s.txt", time.Now().Format("2006/01/20060102")), false},
