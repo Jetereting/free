@@ -2,12 +2,14 @@ package query
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"time"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/extensions"
+	"github.com/moqsien/free/pkgs/utils"
 )
 
 type Downloader struct {
@@ -41,6 +43,40 @@ func (that *Downloader) File(fPath string) {
 			f.Close()
 		}
 	})
+	that.colletor.Visit(that.url)
+}
+
+func (that *Downloader) GetFileWithBar(fpath string, force ...bool) {
+	fc := false
+	if len(force) > 0 {
+		fc = force[0]
+	}
+	if ok, _ := utils.PathIsExist(fpath); ok && fc {
+		os.RemoveAll(fpath)
+	}
+
+	// var bar *progressbar.ProgressBar
+
+	// that.colletor.OnResponseHeaders(func(r *colly.Response) {
+	// 	clen := r.Headers.Get("content-length")
+	// 	clenInt, _ := strconv.Atoi(clen)
+	// 	bar = progressbar.DefaultBytes(
+	// 		int64(clenInt),
+	// 		"downloading",
+	// 	)
+	// })
+
+	that.colletor.OnScraped(func(r *colly.Response) {
+		fmt.Println(string(r.Body))
+		if f, err := os.Create(fpath); err == nil {
+			io.Copy(f, bytes.NewBuffer(r.Body))
+			f.Close()
+		} else {
+			fmt.Println(err)
+		}
+	})
+
+	that.colletor.Visit(that.url)
 }
 
 func (that *Downloader) UseProxy(proxy ...string) {

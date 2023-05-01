@@ -50,4 +50,5 @@ func main() {
 	rn.RegisterSite(sites.NewFreeNode())
 	storage_dir := os.Getenv("FREE_VPN_DIR")
 	rn.Run(storage_dir)
+	// example.Test()
 }
